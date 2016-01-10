@@ -1,5 +1,7 @@
 package sagproject.parser
 
+import scala.collection.mutable.MutableList
+
 class SAGTokenizer {
   // word
   val WORD = 0
@@ -39,8 +41,12 @@ class SAGTokenizer {
    */
   def tokenize(str: String) {
     tokenizer.tokenize(str)
-    println(tokenizer.tokens)
   }
+  
+  /**
+   * returns found SAG tokens
+   */
+  def tokens = tokenizer.tokens
   
   /**
    * to init tokenizer
