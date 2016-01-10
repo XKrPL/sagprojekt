@@ -29,17 +29,18 @@ class Tokenizer
   def tokenize(str: String) {
     var s = new String(str)
     tokens.clear
-    var matched = false
     while (!s.equals("")) {
-      println(s)
+      var matched = false
+//      println(s)
       val loop = new Breaks;
       loop.breakable {
         for (info <- tokenInfos) {
           val m = info.regex.matcher(s)
           if (m.find) {
             matched = true
-            
-            val tok = m.group().trim
+//            println("matched " + info.token())
+            val tok = m.group().trim()
+//            println(tok)
             tokens+=new Token(info.token,tok)
             
             s = m.replaceFirst("").trim
@@ -47,10 +48,11 @@ class Tokenizer
           }
         }
       }
+      if (!matched) {
+        throw new ParserException("Unexpected character in input: "+s)
+      }
     }
-    if (!matched) {
-      throw new ParserException("Unexpected character in input: "+s)
-    }
+
   }
   
   /**
