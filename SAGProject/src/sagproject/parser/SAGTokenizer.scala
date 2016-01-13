@@ -24,7 +24,7 @@ object SAGTokenizer {
   // operands
   val GREATER_THAN = INTEGER + 1
   val LESS_THAN = GREATER_THAN + 1
-  val EQUAL = LESS_THAN + 1
+  val EQUAL = LESS_THAN + 1 //unused
 
   // implies
   val IMPLIES = EQUAL + 1
@@ -63,7 +63,7 @@ class SAGTokenizer {
     newTokenizer.add("\\}", SAGTokenizer.CLOSED_BRACE)
     newTokenizer.add(">", SAGTokenizer.GREATER_THAN)
     newTokenizer.add("<", SAGTokenizer.LESS_THAN)
-    newTokenizer.add("=", SAGTokenizer.EQUAL)
+//    newTokenizer.add("=", SAGTokenizer.EQUAL)
     newTokenizer.add("->", SAGTokenizer.IMPLIES)
     newTokenizer.add("\\|\\|", SAGTokenizer.OR)
     newTokenizer.add("&&", SAGTokenizer.AND)

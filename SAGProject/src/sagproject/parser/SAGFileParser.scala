@@ -120,13 +120,13 @@ class SAGFileParser(file: File) {
 
     var maybeGreaterThanOperator = parseOptionally(SAGTokenizer.GREATER_THAN)
     if (maybeGreaterThanOperator != null) {
-      var greaterThanValue = parseObligatory(SAGTokenizer.WORD)
+      var greaterThanValue = parseObligatory(SAGTokenizer.INTEGER)
       return new Relation(Relation.GREATER_THAN, greaterThanValue)
     }
 
     var maybeLessThanOperator = parseOptionally(SAGTokenizer.LESS_THAN)
     if (maybeLessThanOperator != null) {
-      var lessThanValue = parseObligatory(SAGTokenizer.WORD)
+      var lessThanValue = parseObligatory(SAGTokenizer.INTEGER)
       return new Relation(Relation.LESS_THAN, lessThanValue)
     }
     throw new ParseException("no relation found in a condition")
