@@ -67,8 +67,8 @@ class SAGTokenizer {
     newTokenizer.add("->", SAGTokenizer.IMPLIES)
     newTokenizer.add("\\|\\|", SAGTokenizer.OR)
     newTokenizer.add("&&", SAGTokenizer.AND)
-    newTokenizer.add("\\w+", SAGTokenizer.WORD)
     newTokenizer.add("\\d+", SAGTokenizer.INTEGER)
+    newTokenizer.add("\\w+", SAGTokenizer.WORD)
     return newTokenizer
   }
 }

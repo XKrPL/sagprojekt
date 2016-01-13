@@ -26,20 +26,20 @@ class Tokenizer {
    * tokenizes the string and puts found tokens in list
    */
   def tokenize(str: String) {
-    var s = new String(str)
+    var s = new String(str).trim
     tokens.clear
     while (!s.equals("")) {
       var matched = false
-      //      println(s)
+            println("DBUG: currline: " + s)
       val loop = new Breaks;
       loop.breakable {
         for (info <- tokenInfos) {
           val m = info.regex.matcher(s)
           if (m.find) {
             matched = true
-            //            println("matched " + info.token())
+                        println("DBUG: matched: " + info.token())
             val tok = m.group().trim()
-            //            println(tok)
+                        println("DBUG: tok:" + tok)
             tokens += new Token(info.token, tok)
 
             s = m.replaceFirst("").trim

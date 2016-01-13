@@ -6,6 +6,14 @@ object Relation {
   val LESS_THAN = GREATER_THAN + 1
 }
 
-class Relation(relationOperator: Integer, value: String) {
-
+class Relation(relationOperator: Int, value: String) {
+  override def toString: String = {
+    val sign = relationOperator match
+    {
+    case Relation.EQUALS => "="
+    case Relation.GREATER_THAN => ">"
+    case Relation.LESS_THAN => "<"
+    }
+    return "" + sign + value
+  }
 }

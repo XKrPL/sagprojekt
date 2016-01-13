@@ -22,7 +22,10 @@ class SAGFileParser(file: File) {
   }
 
   private def parseActor: Actor = {
-    val actorName = parseObligatory(SAGTokenizer.WORD)
+    println(Thread.currentThread.getStackTrace()(2).getMethodName)
+    var actorName = parseOptionally(SAGTokenizer.WORD)
+    if (actorName == null)
+      return null
     parseObligatory(SAGTokenizer.OPEN_BRACE)
     val rules = parseRules
     parseObligatory(SAGTokenizer.CLOSED_BRACE)
@@ -34,15 +37,19 @@ class SAGFileParser(file: File) {
    * sequence
    */
   private def parseObligatory(token: Integer): String = {
+    println(Thread.currentThread.getStackTrace()(2).getMethodName)
     if (currentToken == null)
       currentToken = interpreter.getNextToken
     if (currentToken == null)
       throw new ParseException("unexpected end of stream, token " + token + " expected")
+    println("token" + currentToken.sequence() )
     if (currentToken.token() == token) {
       val toRet = currentToken.sequence
       currentToken = null // consume token
       return toRet
     }
+    println("token " + token + " expected, but "
+      + currentToken.token + " found")
     throw new ParseException("token " + token + " expected, but "
       + currentToken.token + " found")
   }
@@ -52,10 +59,12 @@ class SAGFileParser(file: File) {
    * sequence
    */
   private def parseOptionally(token: Integer): String = {
+    println(Thread.currentThread.getStackTrace()(2).getMethodName)
     if (currentToken == null)
       currentToken = interpreter.getNextToken
     if (currentToken == null)
       return null
+    println("token" + currentToken.sequence() )
     if (currentToken.token() == token) {
       val toRet = currentToken.sequence
       currentToken = null // consume token
@@ -65,6 +74,7 @@ class SAGFileParser(file: File) {
   }
 
   private def parseRules: List[Rule] = {
+    println(Thread.currentThread.getStackTrace()(2).getMethodName)
     val list = new MutableList[Rule]
     var rule = parseRule
     while (rule != null) {
@@ -75,19 +85,22 @@ class SAGFileParser(file: File) {
   }
 
   private def parseRule: Rule = {
+    println(Thread.currentThread.getStackTrace()(2).getMethodName)
     val conditions = parseConditions
+    if (conditions.isEmpty) 
+      return null  
     val impliesState = parseImpliesState
-    if (conditions != null && impliesState != null) {
-      return new Rule(conditions, impliesState)
-    }
-    return null
+    if (impliesState == null)
+      return null
+    return new Rule(conditions, impliesState)
   }
 
   private def parseConditions: List[Condition] = {
+    println(Thread.currentThread.getStackTrace()(2).getMethodName)
     val list = new MutableList[Condition]
     var condition = parseCondition
     if (condition == null)
-      return null
+      return list.toList
     list += condition
     while (true) {
       if (parseOptionally(SAGTokenizer.AND) == null) {
@@ -103,6 +116,7 @@ class SAGFileParser(file: File) {
   }
 
   private def parseCondition: Condition = {
+    println(Thread.currentThread.getStackTrace()(2).getMethodName)
     var actorName = parseOptionally(SAGTokenizer.WORD)
     if (actorName == null)
       return null // no condition found
@@ -113,11 +127,17 @@ class SAGFileParser(file: File) {
   }
 
   private def parseRelation: Relation = {
+    println(Thread.currentThread.getStackTrace()(2).getMethodName)
     var maybeEqualsValue = parseOptionally(SAGTokenizer.WORD)
     if (maybeEqualsValue != null) {
       return new Relation(Relation.EQUALS, maybeEqualsValue)
     }
 
+    maybeEqualsValue = parseOptionally(SAGTokenizer.INTEGER)
+    if (maybeEqualsValue != null) {
+      return new Relation(Relation.EQUALS, maybeEqualsValue)
+    }
+    
     var maybeGreaterThanOperator = parseOptionally(SAGTokenizer.GREATER_THAN)
     if (maybeGreaterThanOperator != null) {
       var greaterThanValue = parseObligatory(SAGTokenizer.INTEGER)
@@ -133,7 +153,11 @@ class SAGFileParser(file: File) {
   }
 
   private def parseImpliesState: String = {
+    println(Thread.currentThread.getStackTrace()(2).getMethodName)
     parseObligatory(SAGTokenizer.IMPLIES)
+    val maybeInteger = parseOptionally(SAGTokenizer.INTEGER)
+    if (maybeInteger != null)
+      return maybeInteger
     return parseObligatory(SAGTokenizer.WORD)
   }
 

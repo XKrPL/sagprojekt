@@ -18,7 +18,7 @@ class SAGInterpreter(file: File) {
 
   //retrieves next token to process
   def getNextToken: Token = {
-    if (lineTokensToProcess.isEmpty) {
+    while (lineTokensToProcess.isEmpty) {
       if (scanner.hasNextLine) {
         sagTokenizer.tokenize(scanner.nextLine)
         for (token <- sagTokenizer.tokens) {

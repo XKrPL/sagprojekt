@@ -1,0 +1,17 @@
+czajnik {
+  czujnik1(ON) && drzwi(OPEN) -> ON
+}
+
+klimatyzacja {
+  czujnikTemp(>20) && okno(CLOSED) -> ON
+  czujnikTemp(<20) -> OFF
+  czujnikTemp(20) -> OFF
+  okno(OPENED) -> OFF
+}
+
+roleta1 {
+   czujnikSwiatla(>50) -> 100
+   czujnikSwiatla(50) -> 100 
+   czujnikSwiatla(<50) -> 50 
+   czujnikSwiatla(<20) -> 0 
+}
