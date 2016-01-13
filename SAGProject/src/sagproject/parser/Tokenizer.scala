@@ -30,16 +30,16 @@ class Tokenizer {
     tokens.clear
     while (!s.equals("")) {
       var matched = false
-            println("DBUG: currline: " + s)
+      println("DBUG: currline: " + s)
       val loop = new Breaks;
       loop.breakable {
         for (info <- tokenInfos) {
           val m = info.regex.matcher(s)
           if (m.find) {
             matched = true
-                        println("DBUG: matched: " + info.token())
+            println("DBUG: matched: " + info.token())
             val tok = m.group().trim()
-                        println("DBUG: tok:" + tok)
+            println("DBUG: tok:" + tok)
             tokens += new Token(info.token, tok)
 
             s = m.replaceFirst("").trim
