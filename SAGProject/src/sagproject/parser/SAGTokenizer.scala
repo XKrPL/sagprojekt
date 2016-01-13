@@ -2,7 +2,7 @@ package sagproject.parser
 
 import scala.collection.mutable.MutableList
 
-class SAGTokenizer {
+object SAGTokenizer {
   // word
   val WORD = 0
   
@@ -17,12 +17,12 @@ class SAGTokenizer {
   // integer
   val INTEGER = CLOSED_BRACE + 1
   
-  // boolean values
-  val ON = INTEGER + 1
-  val OFF = ON + 1
+//  // boolean values
+//  val ON = INTEGER + 1
+//  val OFF = ON + 1
   
   // operands
-  val GREATER_THAN = OFF + 1
+  val GREATER_THAN = INTEGER + 1
   val LESS_THAN = GREATER_THAN + 1
   val EQUAL = LESS_THAN + 1
   
@@ -32,6 +32,11 @@ class SAGTokenizer {
   // logical operators
   val OR = IMPLIES + 1
   val AND = OR + 1
+  
+}
+
+
+class SAGTokenizer {
   
   /** tokenizer */
   private val tokenizer = initTokenizer
@@ -46,27 +51,25 @@ class SAGTokenizer {
   /**
    * returns found SAG tokens
    */
-  def tokens = tokenizer.tokens
+  def tokens: MutableList[Token] = tokenizer.tokens
   
   /**
    * to init tokenizer
    */
   private def initTokenizer : Tokenizer = {
     val newTokenizer = new Tokenizer
-    newTokenizer.add("\\(", OPEN_BRACKET)
-    newTokenizer.add("\\)", CLOSED_BRACKET)
-    newTokenizer.add("\\{", OPEN_BRACE)
-    newTokenizer.add("\\}", CLOSED_BRACE)
-    newTokenizer.add("ON", ON)
-    newTokenizer.add("OFF", OFF)
-    newTokenizer.add(">", GREATER_THAN)
-    newTokenizer.add("<", LESS_THAN)
-    newTokenizer.add("=", EQUAL)
-    newTokenizer.add("->", IMPLIES)
-    newTokenizer.add("\\|\\|", OR)
-    newTokenizer.add("&&", AND)
-    newTokenizer.add("\\w+", WORD)
-    newTokenizer.add("\\d+", INTEGER)
+    newTokenizer.add("\\(", SAGTokenizer.OPEN_BRACKET)
+    newTokenizer.add("\\)", SAGTokenizer.CLOSED_BRACKET)
+    newTokenizer.add("\\{", SAGTokenizer.OPEN_BRACE)
+    newTokenizer.add("\\}", SAGTokenizer.CLOSED_BRACE)
+    newTokenizer.add(">", SAGTokenizer.GREATER_THAN)
+    newTokenizer.add("<", SAGTokenizer.LESS_THAN)
+    newTokenizer.add("=", SAGTokenizer.EQUAL)
+    newTokenizer.add("->", SAGTokenizer.IMPLIES)
+    newTokenizer.add("\\|\\|", SAGTokenizer.OR)
+    newTokenizer.add("&&", SAGTokenizer.AND)
+    newTokenizer.add("\\w+", SAGTokenizer.WORD)
+    newTokenizer.add("\\d+", SAGTokenizer.INTEGER)
     return newTokenizer
   }
 }
