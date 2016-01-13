@@ -1,5 +1,5 @@
 package sagproject.actors
 
-class Condition (actorName: String, relation: Relation){
-  
+class Condition(actorName: String, relation: Relation) {
+
 }

@@ -6,6 +6,6 @@ object Relation {
   val LESS_THAN = GREATER_THAN + 1
 }
 
-class Relation (relationOperator: Integer, value: String){
-  
+class Relation(relationOperator: Integer, value: String) {
+
 }

@@ -10,8 +10,7 @@ import scala.util.control._
 /**
  * class for tokenizing
  */
-class Tokenizer
-{
+class Tokenizer {
   /** token infos in a list */
   private val tokenInfos = new MutableList[TokenInfo]
   /** found tokens */
@@ -20,7 +19,7 @@ class Tokenizer
    * adds new token to tokenizer
    */
   def add(regex: String, token: Integer) {
-    tokenInfos+=(new TokenInfo(Pattern.compile("^("+regex+")"),token))
+    tokenInfos += (new TokenInfo(Pattern.compile("^(" + regex + ")"), token))
   }
 
   /**
@@ -31,37 +30,37 @@ class Tokenizer
     tokens.clear
     while (!s.equals("")) {
       var matched = false
-//      println(s)
+      //      println(s)
       val loop = new Breaks;
       loop.breakable {
         for (info <- tokenInfos) {
           val m = info.regex.matcher(s)
           if (m.find) {
             matched = true
-//            println("matched " + info.token())
+            //            println("matched " + info.token())
             val tok = m.group().trim()
-//            println(tok)
-            tokens+=new Token(info.token,tok)
-            
+            //            println(tok)
+            tokens += new Token(info.token, tok)
+
             s = m.replaceFirst("").trim
             loop.break
           }
         }
       }
       if (!matched) {
-        throw new ParserException("Unexpected character in input: "+s)
+        throw new ParserException("Unexpected character in input: " + s)
       }
     }
 
   }
-  
+
   /**
    * token info (token definition)
    */
-  class TokenInfo(regex: Pattern, token : Integer) {
+  class TokenInfo(regex: Pattern, token: Integer) {
     def token(): Integer = token
     def regex(): Pattern = regex
   }
-  
+
   class ParserException(message: String) extends Exception
 }
