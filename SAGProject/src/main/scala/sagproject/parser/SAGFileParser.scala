@@ -1,33 +1,71 @@
 package sagproject.parser
 
 import java.io.File
-import actors.{Condition, Actor, Rule}
+import sagproject.communication.Device
+import sagproject.rules.{Condition, Rule, Relation}
+import scala.collection.mutable
 import scala.collection.mutable.MutableList
-import sagproject.actors.Relation
 
 class SAGFileParser(file: File) {
   private val interpreter = new SAGInterpreter(file)
   private var currentToken: Token = null
 
-  def parse: List[Actor] = {
-    val list = new MutableList[Actor]
+  def parse: List[Device] = {
+    var actorsMap = Map[String, Device]()
+    //list of actors that have to be informed by key
+    var actorsToBeInformed = Map[String, mutable.Set[String]]()
+    //list of actors that state has to be kept by key
+    var actorsToHoldState = Map[String,  mutable.Set[String]]()
+
     var actor = parseActor
+    //create actor
     while (actor != null) {
-      list += actor
+      //TODO extract to method
+      actor.rules.foreach(rule => rule.conditions.foreach(condition => {
+        //update that newly created actor has to be informed by the actors in the condition
+        if(!actorsToBeInformed.get(condition.actorName).isDefined) {
+          actorsToBeInformed += (condition.actorName-> new mutable.HashSet[String])
+        }
+        actorsToBeInformed.get(condition.actorName).get += actor.actorName
+        //update that newly created actor has to keep the satet of all actors in the conditions
+        if(!actorsToHoldState.get(actor.actorName).isDefined) {
+          actorsToHoldState += (actor.actorName-> new mutable.HashSet[String])
+        }
+        actorsToHoldState.get(actor.actorName).get += condition.actorName
+      }))
+
+      actorsMap += (actor.actorName -> actor)
       actor = parseActor
     }
-    return list.toList
+
+    //update actors inner lists
+    actorsToBeInformed.foreach {
+      case (actorName, actorsToBeInformedList) => {
+        actorsMap.get(actorName).get.actorsToBeInformed = actorsToBeInformedList;
+      }
+    }
+    actorsToHoldState.foreach {
+      case (actorName, actorsToHoldStateList) => {
+        actorsMap.get(actorName).get.otherActorsStates = actorsToHoldStateList.map(actor => (actor -> actorsMap.get(actor).get.currentState)).toMap;
+      }
+    }
+    return actorsMap.values.toList
   }
 
-  private def parseActor: Actor = {
+  private def parseActor: Device = {
     println(Thread.currentThread.getStackTrace()(2).getMethodName)
-    var actorName = parseOptionally(SAGTokenizer.WORD)
+    val actorName = parseOptionally(SAGTokenizer.WORD)
     if (actorName == null)
       return null
+    parseObligatory(SAGTokenizer.COLON)
+    var actorState = parseOptionally(SAGTokenizer.INTEGER)
+    if (actorState == null) {
+      actorState = parseObligatory(SAGTokenizer.WORD)
+    }
     parseObligatory(SAGTokenizer.OPEN_BRACE)
     val rules = parseRules
     parseObligatory(SAGTokenizer.CLOSED_BRACE)
-    return new Actor(actorName, rules)
+    return new Device(actorName, actorState, rules, new mutable.HashSet[String](), Map[String, String]())
   }
 
   /**
@@ -40,7 +78,7 @@ class SAGFileParser(file: File) {
       currentToken = interpreter.getNextToken
     if (currentToken == null)
       throw new ParseException("unexpected end of stream, token " + token + " expected")
-    println("token" + currentToken.sequence() )
+    println("token " + currentToken.sequence() )
     if (currentToken.token() == token) {
       val toRet = currentToken.sequence
       currentToken = null // consume token
@@ -62,7 +100,7 @@ class SAGFileParser(file: File) {
       currentToken = interpreter.getNextToken
     if (currentToken == null)
       return null
-    println("token" + currentToken.sequence() )
+    println("token " + currentToken.sequence() )
     if (currentToken.token() == token) {
       val toRet = currentToken.sequence
       currentToken = null // consume token

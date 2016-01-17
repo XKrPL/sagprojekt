@@ -1,4 +1,4 @@
-package sagproject.actors
+package sagproject.rules
 
 object Relation {
   val EQUALS = 0
@@ -6,7 +6,7 @@ object Relation {
   val LESS_THAN = GREATER_THAN + 1
 }
 
-class Relation(relationOperator: Int, value: String) {
+case class Relation(relationOperator: Int, value: String) {
   override def toString: String = {
     val sign = relationOperator match
     {

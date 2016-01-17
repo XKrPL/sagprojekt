@@ -32,6 +32,7 @@ object SAGTokenizer {
   // logical operators
   val OR = IMPLIES + 1
   val AND = OR + 1
+  val COLON = AND + 1
 
 }
 
@@ -69,6 +70,7 @@ class SAGTokenizer {
     newTokenizer.add("&&", SAGTokenizer.AND)
     newTokenizer.add("\\d+", SAGTokenizer.INTEGER)
     newTokenizer.add("\\w+", SAGTokenizer.WORD)
+    newTokenizer.add(":", SAGTokenizer.COLON)
     return newTokenizer
   }
 }

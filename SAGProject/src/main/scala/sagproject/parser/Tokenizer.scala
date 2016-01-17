@@ -39,7 +39,7 @@ class Tokenizer {
             matched = true
             println("DBUG: matched: " + info.token())
             val tok = m.group().trim()
-            println("DBUG: tok:" + tok)
+            println("DBUG: tok: " + tok)
             tokens += new Token(info.token, tok)
 
             s = m.replaceFirst("").trim
@@ -57,9 +57,9 @@ class Tokenizer {
   /**
    * token info (token definition)
    */
-  class TokenInfo(regex: Pattern, token: Integer) {
-    def token(): Integer = token
-    def regex(): Pattern = regex
+  class TokenInfo(regexInput: Pattern, tokenInput: Integer) {
+    def token(): Integer = tokenInput
+    def regex(): Pattern = regexInput
   }
 
   class ParserException(message: String) extends Exception
