@@ -1,10 +1,8 @@
 package sagproject.parser
+
 import java.util.regex.Pattern
-import java.util.LinkedList
-import java.lang.Boolean
-import scala.collection.immutable.List
+
 import scala.collection.mutable.MutableList
-import java.util.regex.Matcher
 import scala.util.control._
 
 /**
@@ -15,6 +13,7 @@ class Tokenizer {
   private val tokenInfos = new MutableList[TokenInfo]
   /** found tokens */
   val tokens = new MutableList[Token]
+
   /**
    * adds new token to tokenizer
    */
@@ -59,8 +58,10 @@ class Tokenizer {
    */
   class TokenInfo(regexInput: Pattern, tokenInput: Integer) {
     def token(): Integer = tokenInput
+
     def regex(): Pattern = regexInput
   }
 
   class ParserException(message: String) extends Exception
+
 }

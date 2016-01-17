@@ -1,19 +1,12 @@
 package sagproject.mainapp
 
-import java.util.concurrent.TimeUnit
-
-import akka.actor.{ActorSystem, Props}
-import akka.util.Timeout
-import sagproject.communication.{DeviceActor, SystemMessage, Device}
-import sagproject.parser.Tokenizer
-import sagproject.parser.SAGFileParser
-import sagproject.parser.SAGTokenizer
 import java.io.File
 
-import scala.concurrent.duration.Duration
+import akka.actor.{ActorSystem, Props}
+import sagproject.communication.{DeviceActor, SystemMessage}
+import sagproject.parser.{SAGFileParser, SAGTokenizer, Tokenizer}
 
 object MainApp {
-  implicit val timeout = Timeout(Duration(5, TimeUnit.SECONDS))
 
   def main(args: Array[String]): Unit = {
     parseConfigFile
@@ -26,16 +19,16 @@ object MainApp {
     val sagParser = new SAGFileParser(new File("test.txt"))
     try {
       val actorsList = sagParser.parse
-      actorsList.mkString("","\n","")
+      actorsList.mkString("", "\n", "")
       println("parsing done")
 
       val system = ActorSystem("Main")
       actorsList.foreach(actor => system.actorOf((Props(
         DeviceActor(actor.actorName,
-        actor.currentState,
-        actor.rules,
-        actor.actorsToBeInformed,
-        actor.otherActorsStates))), name = actor.actorName))
+          actor.currentState,
+          actor.rules,
+          actor.actorsToBeInformed,
+          actor.otherActorsStates))), name = actor.actorName))
 
       println("Sending message SystemMessage(\"NONE\", \"ON\") to czujnik1")
       system.actorSelection("/user/" + "czujnik1") ! SystemMessage("NONE", "ON")
@@ -45,8 +38,8 @@ object MainApp {
       system.actorSelection("/user/" + "czujnikSwiatla") ! SystemMessage("NONE", "40")
 
     } catch {
-      case e: Exception=> println(e.getMessage)
-      e.printStackTrace()
+      case e: Exception => println(e.getMessage)
+        e.printStackTrace()
     }
   }
 

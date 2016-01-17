@@ -1,13 +1,9 @@
 package sagproject.communication
 
-import java.util.concurrent.TimeUnit
-
 import akka.actor.Actor
-import akka.util.Timeout
 import sagproject.rules.Rule
 
 import scala.collection.mutable
-import scala.concurrent.duration.Duration
 
 /**
  * Class that is ised inside Akka framework.
@@ -25,7 +21,6 @@ case class DeviceActor(actorName: String,
                        rules: List[Rule],
                        var actorsToBeInformed: mutable.Set[String],
                        var otherActorsStates: Map[String, String]) extends Actor {
-  implicit val timeout = Timeout(Duration(5, TimeUnit.SECONDS))
   var wasInitialized = false
 
   override def toString() = "DeviceActor[actorName= " + actorName + ",\n rules=\n " + rules + "]"
@@ -40,13 +35,13 @@ case class DeviceActor(actorName: String,
       actorsToBeInformed.foreach(actorToBeInformed => context.actorSelection("/user/" + actorToBeInformed)
         ! SystemMessage(actorName, currentState))
     }
-      //message received from other actor
+    //message received from other actor
     case SystemMessage(source, message) => {
       println("Received " + message + " from " + source + " inside " + actorName)
       otherActorsStates += (source -> message)
       //change state that is arised by first fulfilled condition
-      for(rule <- rules ){
-        if(rule.isFulFilled(otherActorsStates)) {
+      for (rule <- rules) {
+        if (rule.isFulFilled(otherActorsStates)) {
           self ! SystemMessage(SystemMessage.NONE, rule.impliesState)
         }
       }

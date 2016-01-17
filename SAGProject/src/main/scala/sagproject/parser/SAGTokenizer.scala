@@ -64,7 +64,7 @@ class SAGTokenizer {
     newTokenizer.add("\\}", SAGTokenizer.CLOSED_BRACE)
     newTokenizer.add(">", SAGTokenizer.GREATER_THAN)
     newTokenizer.add("<", SAGTokenizer.LESS_THAN)
-//    newTokenizer.add("=", SAGTokenizer.EQUAL)
+    //    newTokenizer.add("=", SAGTokenizer.EQUAL)
     newTokenizer.add("->", SAGTokenizer.IMPLIES)
     newTokenizer.add("\\|\\|", SAGTokenizer.OR)
     newTokenizer.add("&&", SAGTokenizer.AND)

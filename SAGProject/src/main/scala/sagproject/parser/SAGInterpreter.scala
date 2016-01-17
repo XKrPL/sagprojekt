@@ -2,7 +2,7 @@ package sagproject.parser
 
 import java.io.File
 import java.util.Scanner
-import scala.collection.mutable.MutableList
+
 import scala.collection.mutable.ListBuffer
 
 class SAGInterpreter(file: File) {

@@ -1,8 +1,10 @@
 package sagproject.parser
 
 import java.io.File
+
 import sagproject.communication.Device
-import sagproject.rules.{Condition, Rule, Relation}
+import sagproject.rules.{Condition, Relation, Rule}
+
 import scala.collection.mutable
 import scala.collection.mutable.MutableList
 
