@@ -39,7 +39,5 @@ object MainApp {
       e.printStackTrace()
     }
     println("parsing done")
-    
   }
-  
 }
