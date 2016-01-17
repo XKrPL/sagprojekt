@@ -35,7 +35,7 @@ object MainApp {
     try {
       println(sagParser.parse.mkString("","\n",""))
     } catch {
-      case e: Exception=> println(e.getMessage) 
+      case e: Exception=> println(e.getMessage)
       e.printStackTrace()
     }
     println("parsing done")

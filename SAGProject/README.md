@@ -1,8 +1,8 @@
 # Inteligentny dom
-Program umo¿liwia symulacjê intelegentnego domu.
+Program umoÅ¼liwia symulacjÄ™ intelegentnego domu.
 
 ##Uruchomienie
-Nale¿y mieæ zainstalowane sbt. Potem w konsoli z posiommu katalogu zawieraj¹cego plik build.sbt kolejno:
+NaleÅ¼y mieÄ‡ zainstalowane sbt. Potem w konsoli z posiommu katalogu zawierajÄ…cego plik build.sbt kolejno:
  * sbt
  * compile (kompiluje projekt)
  * run (uruchamia projekt)

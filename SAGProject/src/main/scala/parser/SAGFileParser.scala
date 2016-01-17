@@ -1,10 +1,8 @@
 package sagproject.parser
 
 import java.io.File
-import sagproject.actors.Actor
+import actors.{Condition, Actor, Rule}
 import scala.collection.mutable.MutableList
-import sagproject.actors.Rule
-import sagproject.actors.Condition
 import sagproject.actors.Relation
 
 class SAGFileParser(file: File) {
