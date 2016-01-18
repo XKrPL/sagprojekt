@@ -2,6 +2,9 @@ package sagproject.parser
 
 import java.util.regex.Pattern
 
+import com.typesafe.scalalogging.Logger
+import org.slf4j.LoggerFactory
+
 import scala.collection.mutable.MutableList
 import scala.util.control._
 
@@ -9,6 +12,7 @@ import scala.util.control._
  * class for tokenizing
  */
 class Tokenizer {
+  private val logger = Logger(LoggerFactory.getLogger(this.getClass.getName))
   /** token infos in a list */
   private val tokenInfos = new MutableList[TokenInfo]
   /** found tokens */
@@ -29,16 +33,16 @@ class Tokenizer {
     tokens.clear
     while (!s.equals("")) {
       var matched = false
-      println("DBUG: currline: " + s)
+      logger.debug("DBUG: currline: " + s)
       val loop = new Breaks;
       loop.breakable {
         for (info <- tokenInfos) {
           val m = info.regex.matcher(s)
           if (m.find) {
             matched = true
-            println("DBUG: matched: " + info.token())
+            logger.debug("DBUG: matched: " + info.token())
             val tok = m.group().trim()
-            println("DBUG: tok: " + tok)
+            logger.debug("DBUG: tok: " + tok)
             tokens += new Token(info.token, tok)
 
             s = m.replaceFirst("").trim

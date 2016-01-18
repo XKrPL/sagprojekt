@@ -2,6 +2,8 @@ package sagproject.parser
 
 import java.io.File
 
+import com.typesafe.scalalogging.Logger
+import org.slf4j.LoggerFactory
 import sagproject.communication.Device
 import sagproject.rules.{Condition, Relation, Rule}
 
@@ -9,6 +11,7 @@ import scala.collection.mutable
 import scala.collection.mutable.MutableList
 
 class SAGFileParser(file: File) {
+  private val logger = Logger(LoggerFactory.getLogger(this.getClass.getName))
   private val interpreter = new SAGInterpreter(file)
   private var currentToken: Token = null
 
@@ -25,13 +28,13 @@ class SAGFileParser(file: File) {
       //TODO extract to method
       actor.rules.foreach(rule => rule.conditions.foreach(condition => {
         //update that newly created actor has to be informed by the actors in the condition
-        if(!actorsToBeInformed.get(condition.actorName).isDefined) {
-          actorsToBeInformed += (condition.actorName-> new mutable.HashSet[String])
+        if (!actorsToBeInformed.get(condition.actorName).isDefined) {
+          actorsToBeInformed += (condition.actorName -> new mutable.HashSet[String])
         }
         actorsToBeInformed.get(condition.actorName).get += actor.actorName
         //update that newly created actor has to keep the satet of all actors in the conditions
-        if(!actorsToHoldState.get(actor.actorName).isDefined) {
-          actorsToHoldState += (actor.actorName-> new mutable.HashSet[String])
+        if (!actorsToHoldState.get(actor.actorName).isDefined) {
+          actorsToHoldState += (actor.actorName -> new mutable.HashSet[String])
         }
         actorsToHoldState.get(actor.actorName).get += condition.actorName
       }))
@@ -55,7 +58,7 @@ class SAGFileParser(file: File) {
   }
 
   private def parseActor: Device = {
-    println(Thread.currentThread.getStackTrace()(2).getMethodName)
+    logger.debug(Thread.currentThread.getStackTrace()(2).getMethodName)
     val actorName = parseOptionally(SAGTokenizer.WORD)
     if (actorName == null)
       return null
@@ -75,18 +78,18 @@ class SAGFileParser(file: File) {
    * sequence
    */
   private def parseObligatory(token: Integer): String = {
-    println(Thread.currentThread.getStackTrace()(2).getMethodName)
+    logger.debug(Thread.currentThread.getStackTrace()(2).getMethodName)
     if (currentToken == null)
       currentToken = interpreter.getNextToken
     if (currentToken == null)
       throw new ParseException("unexpected end of stream, token " + token + " expected")
-    println("token " + currentToken.sequence() )
+    logger.debug("token " + currentToken.sequence())
     if (currentToken.token() == token) {
       val toRet = currentToken.sequence
       currentToken = null // consume token
       return toRet
     }
-    println("token " + token + " expected, but "
+    logger.debug("token " + token + " expected, but "
       + currentToken.token + " found")
     throw new ParseException("token " + token + " expected, but "
       + currentToken.token + " found")
@@ -97,12 +100,12 @@ class SAGFileParser(file: File) {
    * sequence
    */
   private def parseOptionally(token: Integer): String = {
-    println(Thread.currentThread.getStackTrace()(2).getMethodName)
+    logger.debug(Thread.currentThread.getStackTrace()(2).getMethodName)
     if (currentToken == null)
       currentToken = interpreter.getNextToken
     if (currentToken == null)
       return null
-    println("token " + currentToken.sequence() )
+    logger.debug("token " + currentToken.sequence())
     if (currentToken.token() == token) {
       val toRet = currentToken.sequence
       currentToken = null // consume token
@@ -112,7 +115,7 @@ class SAGFileParser(file: File) {
   }
 
   private def parseRules: List[Rule] = {
-    println(Thread.currentThread.getStackTrace()(2).getMethodName)
+    logger.debug(Thread.currentThread.getStackTrace()(2).getMethodName)
     val list = new MutableList[Rule]
     var rule = parseRule
     while (rule != null) {
@@ -123,10 +126,10 @@ class SAGFileParser(file: File) {
   }
 
   private def parseRule: Rule = {
-    println(Thread.currentThread.getStackTrace()(2).getMethodName)
+    logger.debug(Thread.currentThread.getStackTrace()(2).getMethodName)
     val conditions = parseConditions
-    if (conditions.isEmpty) 
-      return null  
+    if (conditions.isEmpty)
+      return null
     val impliesState = parseImpliesState
     if (impliesState == null)
       return null
@@ -134,7 +137,7 @@ class SAGFileParser(file: File) {
   }
 
   private def parseConditions: List[Condition] = {
-    println(Thread.currentThread.getStackTrace()(2).getMethodName)
+    logger.debug(Thread.currentThread.getStackTrace()(2).getMethodName)
     val list = new MutableList[Condition]
     var condition = parseCondition
     if (condition == null)
@@ -154,7 +157,7 @@ class SAGFileParser(file: File) {
   }
 
   private def parseCondition: Condition = {
-    println(Thread.currentThread.getStackTrace()(2).getMethodName)
+    logger.debug(Thread.currentThread.getStackTrace()(2).getMethodName)
     var actorName = parseOptionally(SAGTokenizer.WORD)
     if (actorName == null)
       return null // no condition found
@@ -165,7 +168,7 @@ class SAGFileParser(file: File) {
   }
 
   private def parseRelation: Relation = {
-    println(Thread.currentThread.getStackTrace()(2).getMethodName)
+    logger.debug(Thread.currentThread.getStackTrace()(2).getMethodName)
     var maybeEqualsValue = parseOptionally(SAGTokenizer.WORD)
     if (maybeEqualsValue != null) {
       return new Relation(Relation.EQUALS, maybeEqualsValue)
@@ -175,7 +178,7 @@ class SAGFileParser(file: File) {
     if (maybeEqualsValue != null) {
       return new Relation(Relation.EQUALS, maybeEqualsValue)
     }
-    
+
     var maybeGreaterThanOperator = parseOptionally(SAGTokenizer.GREATER_THAN)
     if (maybeGreaterThanOperator != null) {
       var greaterThanValue = parseObligatory(SAGTokenizer.INTEGER)
@@ -191,7 +194,7 @@ class SAGFileParser(file: File) {
   }
 
   private def parseImpliesState: String = {
-    println(Thread.currentThread.getStackTrace()(2).getMethodName)
+    logger.debug(Thread.currentThread.getStackTrace()(2).getMethodName)
     parseObligatory(SAGTokenizer.IMPLIES)
     val maybeInteger = parseOptionally(SAGTokenizer.INTEGER)
     if (maybeInteger != null)
@@ -200,4 +203,5 @@ class SAGFileParser(file: File) {
   }
 
   class ParseException(message: String) extends Exception
+
 }

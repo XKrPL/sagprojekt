@@ -21,9 +21,8 @@ case class DeviceActor(actorName: String,
                        rules: List[Rule],
                        var actorsToBeInformed: mutable.Set[String],
                        var otherActorsStates: Map[String, String]) extends Actor {
-  var wasInitialized = false
-
-  override def toString() = "DeviceActor[actorName= " + actorName + ",\n rules=\n " + rules + "]"
+  override def toString() = "DeviceActor[actorName=" + actorName +
+    ", currentState=" + currentState + ", rules= " + rules + "]"
 
   override def receive = {
     //message received from system or simulated by user

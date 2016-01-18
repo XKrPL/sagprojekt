@@ -16,6 +16,7 @@ case class Device(actorName: String,
                   rules: List[Rule],
                   var actorsToBeInformed: mutable.Set[String],
                   var otherActorsStates: Map[String, String]) {
-  override def toString() = "Device[actorName= " + actorName + ",\n rules=\n " + rules + "]"
+  override def toString() = "DeviceActor[actorName=" + actorName +
+    ", currentState=" + currentState + ", rules= " + rules + "]"
 
 }
