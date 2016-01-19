@@ -26,13 +26,17 @@ case class DeviceActor(actorName: String,
 
   override def receive = {
     //message received from system or simulated by user
-    case SystemMessage("NONE", message) => {
+    case SystemMessage(SystemMessage.NONE, message) => {
       println("Received " + message + " from system inside " + actorName)
       changeInnerState(message)
       currentState = message
       //information send to all actors that depends on this actor
       actorsToBeInformed.foreach(actorToBeInformed => context.actorSelection("/user/" + actorToBeInformed)
         ! SystemMessage(actorName, currentState))
+    }
+    //message requesting for state of ths device
+    case SystemMessage(SystemMessage.ASK, _) => {
+      sender ! currentState
     }
     //message received from other actor
     case SystemMessage(source, message) => {

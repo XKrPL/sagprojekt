@@ -9,6 +9,6 @@ case class Rule(conditions: List[Condition], impliesState: String) {
    * @return
    */
   def isFulFilled(actorsStates: Map[String, String]) = {
-    conditions.foldLeft(true)((result, condition) => result && condition.isFulFilled(actorsStates))
+    conditions.foldLeft(true)((result, condition) => result && condition.isFulfilled(actorsStates))
   }
 }

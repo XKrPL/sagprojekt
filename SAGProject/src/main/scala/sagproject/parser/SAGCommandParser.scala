@@ -15,6 +15,12 @@ object SAGCommandParser {
     if (words.length != 2) {
       return None
     }
-    Some((words(0), SystemMessage("NONE", words(1))))
+    //ask -> device
+    if(SystemMessage.ASK.equalsIgnoreCase(words(0))) {
+      Some(words(1) -> SystemMessage(SystemMessage.ASK, null))
+    } else {
+      //device -> state
+      Some(words(0) -> SystemMessage(SystemMessage.NONE, words(1)))
+    }
   }
 }

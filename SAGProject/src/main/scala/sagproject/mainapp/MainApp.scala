@@ -2,17 +2,23 @@ package sagproject.mainapp
 
 import java.io.File
 import java.util.Scanner
+import java.util.concurrent.{TimeUnit, TimeoutException}
 
 import akka.actor.{ActorSystem, Props}
+import akka.pattern.ask
+import akka.util.Timeout
 import com.typesafe.scalalogging.Logger
 import org.slf4j.LoggerFactory
-import sagproject.communication.{Device, DeviceActor}
+import sagproject.communication.{Device, DeviceActor, SystemMessage}
 import sagproject.parser.{SAGCommandParser, SAGFileParser}
 
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 import scala.util.control.Breaks._
 
 object MainApp {
   val logger = Logger(LoggerFactory.getLogger(this.getClass.getName))
+  implicit val timeout = Timeout(Duration(5, TimeUnit.SECONDS))
 
   def main(args: Array[String]): Unit = {
     val actorsList = parseConfigFile
@@ -28,7 +34,7 @@ object MainApp {
         //      system.actorSelection("/user/" + "drzwi") ! SystemMessage("NONE", "OPEN")
         //      println("Sending message SystemMessage(\"NONE\", \"40\") to czujnikSwiatla")
         //      system.actorSelection("/user/" + "czujnikSwiatla") ! SystemMessage("NONE", "40")
-        startUserPrompt(system)
+        startUserPrompt(system, actorsList.get.map(actor => actor.actorName))
       }
       case _ => None
     }
@@ -75,27 +81,62 @@ object MainApp {
    * Starts loop for interaction with user.
    *
    * @param system akka system
+   * @param actorsList names of the configured actors
    */
-  def startUserPrompt(system: ActorSystem) = {
+  def startUserPrompt(system: ActorSystem, actorsList: List[String]) = {
     val reader = new Scanner(System.in)
     breakable {
       while (true) {
-        println("Wpisz wiadomosci w formacie \"nazwaUrzadzenia -> wartosc\"")
+        println("Podawaj polecenia. Wpisz \"help\" po pomoc.")
         val line = reader.nextLine()
 
         if ("help".equals(line)) {
-          println("Podaj komendę lub help (pomoc).")
-          println("exit - wyjscie")
+          printHelp
         } else if ("exit".equals(line)) {
           break
+        } else if ("list".equals(line)) {
+          println(actorsList.mkString(","))
         } else {
           val userCommand = SAGCommandParser.parseUserCommand(line)
           userCommand match {
-            case Some((deviceName, command)) => system.actorSelection("/user/" + deviceName) ! command
+            //asking for device value with Future usage
+            case Some((deviceName, SystemMessage(SystemMessage.ASK, _))) => {
+              if (actorsList.contains(deviceName)) {
+                try {
+                  val actorRef = Await.result(system.actorSelection("/user/" + deviceName).resolveOne(), timeout.duration)
+                  val askFuture = actorRef ? SystemMessage(SystemMessage.ASK, null)
+                  val askResult = Await.result(askFuture, timeout.duration).asInstanceOf[String]
+                  println("Otrzymano stan: " + deviceName + "=" + askResult)
+                } catch {
+                  case ex: TimeoutException => {
+                    //ignore
+                  }
+                }
+              } else {
+                println("Podane urzadzenie " + deviceName + " nie istnieje.")
+              }
+            }
+            //simple sending message to device
+            case Some((deviceName, command)) => {
+              if (actorsList.contains(deviceName)) {
+                system.actorSelection("/user/" + deviceName) ! command
+              } else {
+                println("Podane urzadzenie " + deviceName + " nie istnieje.")
+              }
+            }
             case None => println("Niepoprawny format komendy.")
           }
         }
       }
     }
+  }
+
+  def printHelp = {
+    println("nazwaUrzadzenia wartosc - ustawienie wartosci na urządzeniu")
+    println("ask nazwaUrzadzenia - zapytanie o wartossc")
+    println("list - wyswietla liste nazw urzadzen")
+    println("help - pomoc")
+    println("exit - wyjscie")
+
   }
 }
