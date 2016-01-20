@@ -2,6 +2,9 @@ package sagproject.parser
 
 import sagproject.communication.SystemMessage
 
+/**
+ * Helper for parsing command written by user in the console.
+ */
 object SAGCommandParser {
 
   /**

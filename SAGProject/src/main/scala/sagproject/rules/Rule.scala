@@ -1,5 +1,11 @@
 package sagproject.rules
 
+/**
+ * Rule aggregating multiple conditions.
+ *
+ * @param conditions list of all condition
+ * @param impliesState state that should be set if rule is fulfilled
+ */
 case class Rule(conditions: List[Condition], impliesState: String) {
   override def toString = conditions.mkString("", " && ", "") + " -> " + impliesState
 

@@ -5,6 +5,11 @@ import java.util.Scanner
 
 import scala.collection.mutable.ListBuffer
 
+/**
+ * Parses file with the configuration.
+ *
+ * @param file file to be parsed
+ */
 class SAGInterpreter(file: File) {
 
   //scanner for sag files

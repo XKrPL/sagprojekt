@@ -13,7 +13,7 @@ object SystemMessage {
 }
 
 /**
- * Class that is transporting informations between actor.
+ * Class that is transporting information between actor.
  *
  * @param source actor that generated that message
  * @param message transported value

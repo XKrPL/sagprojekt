@@ -51,7 +51,8 @@ class SAGFileParser(file: File) {
     }
     actorsToHoldState.foreach {
       case (actorName, actorsToHoldStateList) => {
-        actorsMap.get(actorName).get.otherActorsStates = actorsToHoldStateList.map(actor => (actor -> actorsMap.get(actor).get.currentState)).toMap;
+        //here actors inner states are now filled, because they will be initialized inside actor
+        actorsMap.get(actorName).get.otherActorsStates = actorsToHoldStateList.map(actor => (actor -> null)).toMap;
       }
     }
     return actorsMap.values.toList
