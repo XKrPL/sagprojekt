@@ -7,8 +7,7 @@ import java.util.concurrent.{TimeUnit, TimeoutException}
 import akka.actor.{ActorSystem, Props}
 import akka.pattern.ask
 import akka.util.Timeout
-import com.typesafe.scalalogging.Logger
-import org.slf4j.LoggerFactory
+import com.typesafe.scalalogging.LazyLogging
 import sagproject.communication.{Device, DeviceActor, SystemMessage}
 import sagproject.parser.{SAGCommandParser, SAGFileParser}
 
@@ -16,8 +15,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.util.control.Breaks._
 
-object MainApp {
-  val logger = Logger(LoggerFactory.getLogger(this.getClass.getName))
+object MainApp extends LazyLogging {
   implicit val timeout = Timeout(Duration(5, TimeUnit.SECONDS))
 
   def main(args: Array[String]): Unit = {
@@ -34,7 +32,11 @@ object MainApp {
         //      system.actorSelection("/user/" + "drzwi") ! SystemMessage("NONE", "OPEN")
         //      println("Sending message SystemMessage(\"NONE\", \"40\") to czujnikSwiatla")
         //      system.actorSelection("/user/" + "czujnikSwiatla") ! SystemMessage("NONE", "40")
-        startUserPrompt(system, actorsList.get.map(actor => actor.actorName))
+        if (args.length != 0 && "test".equals(args(0))) {
+          testScenario1(system, actorsList.get.map(actor => actor.actorName))
+        } else {
+          startUserPrompt(system, actorsList.get.map(actor => actor.actorName))
+        }
       }
       case _ => None
     }
@@ -106,7 +108,7 @@ object MainApp {
                   val actorRef = Await.result(system.actorSelection("/user/" + deviceName).resolveOne(), timeout.duration)
                   val askFuture = actorRef ? SystemMessage(SystemMessage.ASK, null)
                   val askResult = Await.result(askFuture, timeout.duration).asInstanceOf[String]
-                  println("Otrzymano stan: " + deviceName + "=" + askResult)
+                  logger.info("Otrzymano stan: " + deviceName + "=" + askResult)
                 } catch {
                   case ex: TimeoutException => {
                     //ignore
@@ -138,5 +140,21 @@ object MainApp {
     println("help - pomoc")
     println("exit - wyjscie")
 
+  }
+
+  def testScenario1(system: ActorSystem, actorsList: List[String]) = {
+    logger.info("Rozpoczeto wysyłanie wiadomosci.")
+    for (i <- 1 until 1000) {
+      (i % 7) match {
+        case 0 => system.actorSelection("/user/" + "czujnik1") ! SystemMessage(SystemMessage.NONE, "ON")
+        case 1 => system.actorSelection("/user/" + "czujnik1") ! SystemMessage(SystemMessage.NONE, "OFF")
+        case 2 => system.actorSelection("/user/" + "drzwi") ! SystemMessage(SystemMessage.NONE, "CLOSED")
+        case 3 => system.actorSelection("/user/" + "drzwi") ! SystemMessage(SystemMessage.NONE, "OPEN")
+        case 4 => system.actorSelection("/user/" + "czujnikTemp") ! SystemMessage(SystemMessage.NONE, String.valueOf(i % 100))
+        case 5 => system.actorSelection("/user/" + "czujnikSwiatla") ! SystemMessage(SystemMessage.NONE, String.valueOf(i % 100))
+        case 6 => system.actorSelection("/user/" + "roleta") ! SystemMessage(SystemMessage.NONE, String.valueOf(i % 100))
+      }
+    }
+    logger.info("Zakończono wysyłanie wiadomosci.")
   }
 }

@@ -1,7 +1,6 @@
 package sagproject.rules
 
-import com.typesafe.scalalogging.Logger
-import org.slf4j.LoggerFactory
+import com.typesafe.scalalogging.LazyLogging
 
 /**
  * Represents one condition from configuration file.
@@ -10,9 +9,7 @@ import org.slf4j.LoggerFactory
  * @param actorName
  * @param relation
  */
-case class Condition(actorName: String, relation: Relation) {
-  private val logger = Logger(LoggerFactory.getLogger(this.getClass.getName))
-
+case class Condition(actorName: String, relation: Relation) extends LazyLogging {
   override def toString = actorName + "(" + relation + ")"
 
   /**

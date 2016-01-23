@@ -2,8 +2,7 @@ package sagproject.parser
 
 import java.util.regex.Pattern
 
-import com.typesafe.scalalogging.Logger
-import org.slf4j.LoggerFactory
+import com.typesafe.scalalogging.LazyLogging
 
 import scala.collection.mutable.MutableList
 import scala.util.control._
@@ -11,8 +10,7 @@ import scala.util.control._
 /**
  * class for tokenizing
  */
-class Tokenizer {
-  private val logger = Logger(LoggerFactory.getLogger(this.getClass.getName))
+class Tokenizer extends LazyLogging {
   /** token infos in a list */
   private val tokenInfos = new MutableList[TokenInfo]
   /** found tokens */

@@ -5,6 +5,7 @@ import java.util.concurrent.{TimeUnit, TimeoutException}
 import akka.actor.Actor
 import akka.pattern.ask
 import akka.util.Timeout
+import com.typesafe.scalalogging.LazyLogging
 import sagproject.rules.Rule
 
 import scala.collection.mutable
@@ -26,7 +27,7 @@ case class DeviceActor(actorName: String,
                        var currentState: String,
                        rules: List[Rule],
                        var actorsToBeInformed: mutable.Set[String],
-                       var otherActorsStates: Map[String, String]) extends Actor {
+                       var otherActorsStates: Map[String, String]) extends Actor with LazyLogging {
   implicit val timeout = Timeout(Duration(5, TimeUnit.SECONDS))
   /**
    * Variable describing if initializing of this device was already performed.
@@ -39,7 +40,7 @@ case class DeviceActor(actorName: String,
   override def receive = {
     //message received from system (hardware) or simulated by user
     case SystemMessage(SystemMessage.NONE, message) => {
-      println("Received " + message + " from system inside " + actorName)
+      logger.info("Received " + message + " from system inside " + actorName)
       changeInnerState(message)
       currentState = message
       //information send to all actors that depends on this actor
@@ -56,7 +57,7 @@ case class DeviceActor(actorName: String,
         initialize
       }
       if (wasInitialized) {
-        println("Received " + message + " from " + source + " inside " + actorName)
+        logger.info("Received " + message + " from " + source + " inside " + actorName)
         otherActorsStates += (source -> message)
         //change state that is arised by first fulfilled condition
         var stateChanged = false
@@ -76,7 +77,7 @@ case class DeviceActor(actorName: String,
    * @param newState stete to be set.
    */
   def changeInnerState(newState: String) = {
-    println("Changing inner state of " + actorName + " to: " + newState)
+    logger.info("Changing inner state of " + actorName + " to: " + newState)
     currentState = newState
   }
 
@@ -94,12 +95,12 @@ case class DeviceActor(actorName: String,
           (deviceName -> askResult)
         }
       }
-      println("Device " + actorName + " was initialized")
+      logger.info("Device " + actorName + " was initialized")
       wasInitialized = true
     } catch {
       case ex: TimeoutException => {
         wasInitialized = false
-        println("Unable to initialize device " + actorName)
+        logger.info("Unable to initialize device " + actorName)
       }
     }
 

@@ -2,16 +2,14 @@ package sagproject.parser
 
 import java.io.File
 
-import com.typesafe.scalalogging.Logger
-import org.slf4j.LoggerFactory
+import com.typesafe.scalalogging.LazyLogging
 import sagproject.communication.Device
 import sagproject.rules.{Condition, Relation, Rule}
 
 import scala.collection.mutable
 import scala.collection.mutable.MutableList
 
-class SAGFileParser(file: File) {
-  private val logger = Logger(LoggerFactory.getLogger(this.getClass.getName))
+class SAGFileParser(file: File) extends LazyLogging {
   private val interpreter = new SAGInterpreter(file)
   private var currentToken: Token = null
 
