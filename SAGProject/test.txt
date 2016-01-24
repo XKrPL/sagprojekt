@@ -30,3 +30,14 @@ okno:CLOSED {
 
 czujnikSwiatla:20 {
 }
+
+
+test1:ON {
+  test2(ON) -> ON
+  test2(OFF) -> OFF
+}
+
+test2:OFF {
+  test1(ON) -> OFF
+  test1(OFF) -> ON
+}
