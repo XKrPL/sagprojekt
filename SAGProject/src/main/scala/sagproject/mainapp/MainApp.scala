@@ -26,14 +26,14 @@ object MainApp extends LazyLogging {
     }
     system match {
       case Some(system) => {
-        //      println("Sending message SystemMessage(\"NONE\", \"ON\") to czujnik1")
-        //      system.actorSelection("/user/" + "czujnik1") ! SystemMessage("NONE", "ON")
-        //      println("Sending message SystemMessage(\"NONE\", \"OPEN\") to drzwi")
-        //      system.actorSelection("/user/" + "drzwi") ! SystemMessage("NONE", "OPEN")
-        //      println("Sending message SystemMessage(\"NONE\", \"40\") to czujnikSwiatla")
-        //      system.actorSelection("/user/" + "czujnikSwiatla") ! SystemMessage("NONE", "40")
-        if (args.length != 0 && "test".equals(args(0))) {
+        if (args.length != 0 && "1".equals(args(0))) {
           testScenario1(system, actorsList.get.map(actor => actor.actorName))
+        } else if (args.length != 0 && "2".equals(args(0))) {
+          testScenario2(system, actorsList.get.map(actor => actor.actorName))
+        } else if (args.length != 0 && "3".equals(args(0))) {
+          testScenario3(system, actorsList.get.map(actor => actor.actorName))
+        } else if (args.length != 0 && "4".equals(args(0))) {
+          testScenario4(system, actorsList.get.map(actor => actor.actorName))
         } else {
           startUserPrompt(system, actorsList.get.map(actor => actor.actorName))
         }
@@ -142,7 +142,19 @@ object MainApp extends LazyLogging {
 
   }
 
+  /**
+   * Wrong configuration that has a loop.
+   */
   def testScenario1(system: ActorSystem, actorsList: List[String]) = {
+    logger.info("Rozpoczeto wysyłanie wiadomosci.")
+    system.actorSelection("/user/" + "test1") ! SystemMessage(SystemMessage.NONE, "ON")
+    logger.info("Zakończono wysyłanie wiadomosci.")
+  }
+
+  /**
+   * 1000 different messages.
+   */
+  def testScenario2(system: ActorSystem, actorsList: List[String]) = {
     logger.info("Rozpoczeto wysyłanie wiadomosci.")
     for (i <- 1 until 1000) {
       (i % 7) match {
@@ -155,6 +167,30 @@ object MainApp extends LazyLogging {
         case 6 => system.actorSelection("/user/" + "roleta") ! SystemMessage(SystemMessage.NONE, String.valueOf(i % 100))
       }
     }
+    logger.info("Zakończono wysyłanie wiadomosci.")
+  }
+
+  /**
+   * Two first tests together.
+   */
+  def testScenario3(system: ActorSystem, actorsList: List[String]) = {
+    logger.info("Rozpoczeto wysyłanie wiadomosci.")
+    testScenario2(system, actorsList)
+    testScenario1(system, actorsList)
+    logger.info("Zakończono wysyłanie wiadomosci.")
+  }
+
+  /**
+   * Normal scenario.
+   */
+  def testScenario4(system: ActorSystem, actorsList: List[String]) = {
+    logger.info("Rozpoczeto wysyłanie wiadomosci.")
+    system.actorSelection("/user/" + "czujnik1") ! SystemMessage(SystemMessage.NONE, "ON")
+    system.actorSelection("/user/" + "drzwi") ! SystemMessage(SystemMessage.NONE, "OPEN")
+    system.actorSelection("/user/" + "drzwi") ! SystemMessage(SystemMessage.NONE, "CLOSED")
+    system.actorSelection("/user/" + "czujnikSwiatla") ! SystemMessage(SystemMessage.NONE, "25")
+    system.actorSelection("/user/" + "czujnik1") ! SystemMessage(SystemMessage.NONE, "OFF")
+    system.actorSelection("/user/" + "czujnikSwiatla") ! SystemMessage(SystemMessage.NONE, "56")
     logger.info("Zakończono wysyłanie wiadomosci.")
   }
 }
